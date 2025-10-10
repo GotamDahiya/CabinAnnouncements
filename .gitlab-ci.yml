@@ -20,9 +20,10 @@ windows_bin:
   script:
     - echo "Creating Windows artifact"
     - pip install -r requirements.txt
-    - pyinstaller --onefile --name $APP_NAME $MAIN_SCRIPT
+    - pyinstaller --onefile --name test.exe cabinselection.py
     
   artifacts:
+    name: "$APP_NAME"
     paths:
       - dist/
     when: on_success
