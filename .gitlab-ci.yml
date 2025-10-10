@@ -21,7 +21,7 @@ windows_bin:
     - echo "Creating Windows artifact"
     - pip install -r requirements.txt
     - pyinstaller --onefile --name "$APP_NAME" $MAIN_SCRIPT
-    - cp ./dist/*.exe ../
+    - cp ./dist/*.exe .
   artifacts:
     name: "$APP_NAME"
     paths:
