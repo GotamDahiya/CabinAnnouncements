@@ -1,6 +1,6 @@
 # Global variables
 variables:
-  APP_NAME: "Toliss Test.exe"
+  APP_NAME: "Toliss Cabin Announements.exe"
   MAIN_SCRIPT: "cabinselection.py"
   # Set the target architecture here: 64bit is the default.
   # The image automatically handles the cross-compilation environment.
@@ -20,10 +20,10 @@ windows_bin:
   script:
     - echo "Creating Windows artifact"
     - pip install -r requirements.txt
-    - pyinstaller --onefile --name test.exe cabinselection.py
-    
+    - pyinstaller --onefile --name "$APP_NAME" $MAIN_SCRIPT
+    - cp ./dist/*.exe ../
   artifacts:
     name: "$APP_NAME"
     paths:
-      - dist/
+      - '*.exe'
     when: on_success
