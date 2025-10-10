@@ -1,68 +1,59 @@
-# Use a valid, stable Windows Server Core image.
-image: mcr.microsoft.com/windows/servercore:ltsc2022
+# Use a Python image specifically built for cross-compilation with MinGW
+# Replace '3.10' with your desired base Python version (e.g., '3.11', '3.9')
+image: cdgriffith/pyinstaller-windows:python-3.10
 
 # Global variables
 variables:
-  APP_NAME: "Toliss-Test.exe"
-  MAIN_SCRIPT: "cabinseletion.py"
-  # --- Variables for Python Version Control ---
-  PYTHON_VERSION: "3.13.8"
-  PYTHON_MAJOR_MINOR: "3.13" # Used for constructing paths/URLs
-  # URL uses the above variables to download the 64-bit installer
-  PYTHON_INSTALLER_URL: "https://www.python.org/ftp/python/$PYTHON_MAJOR_MINOR/python-$PYTHON_VERSION-amd64.exe" 
+  APP_NAME: "Toliss Test.exe"
+  MAIN_SCRIPT: "cabinselection.py"
+  # Set the target architecture here: 64bit is the default.
+  # The image automatically handles the cross-compilation environment.
+  TARGET_ARCH: "64bit" 
 
 # Define the pipeline stage
 stages:
   - build
 
 # ----------------------------------------------------
-# Windows 64-bit PyInstaller Build Job (PowerShell on Windows Docker)
+# Windows 64-bit PyInstaller Build Job (MinGW/Cross-Compiler)
 # ----------------------------------------------------
 build_windows_x64_executable:
   stage: build
   
+  # This job runs on any standard Linux/Docker runner
+  # tags:
+  #   - docker
+
+  # Only run on Git tags (releases)
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: always
+
   script:
-    - |
-      powershell -command {
-        # Define variables inside the PowerShell scope
-        $PYTHON_INSTALLER_URL = "$env:PYTHON_INSTALLER_URL"
-        $PYTHON_VERSION = "$env:PYTHON_VERSION"
-        $APP_NAME = "$env:APP_NAME"
-        $MAIN_SCRIPT = "$env:MAIN_SCRIPT"
-        
-        Write-Host "Starting 64-bit Windows PyInstaller build for Python $PYTHON_VERSION..."
-        
-        # 1. Download and Install 64-bit Python
-        Write-Host "Downloading 64-bit Python installer from $PYTHON_INSTALLER_URL..."
-        Invoke-WebRequest -Uri $PYTHON_INSTALLER_URL -OutFile "C:\python_installer_64bit.exe"
-        
-        # Execute the 64-bit installer silently, installing for all users and adding to PATH
-        Start-Process "C:\python_installer_64bit.exe" -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1" -Wait
-        
-        # 2. Update PATH and Verify Python
-        # Construct the installation path: C:\Python<MajorMinor> (e.g., C:\Python310)
-        $PYTHON_INSTALL_DIR_SHORT = "C:\Python$($PYTHON_VERSION.Split('.')[0])$($PYTHON_VERSION.Split('.')[1])"
-        $env:Path = "$env:Path;$PYTHON_INSTALL_DIR_SHORT;$PYTHON_INSTALL_DIR_SHORT\Scripts"
-        Write-Host "Using Python path: $PYTHON_INSTALL_DIR_SHORT"
+    - echo "Starting cross-platform $TARGET_ARCH Windows build using MinGW toolchain..."
 
-        # 3. Install PyInstaller and Dependencies using 64-bit Python
-        python -m pip install --upgrade pip
-        python -m pip install pyinstaller
-        python -m pip install -r requirements.txt
-        
-        # 4. Run PyInstaller
-        pyinstaller --onefile --name $APP_NAME --clean $MAIN_SCRIPT
+    ## 1. Install Dependencies
+    # Pip is run natively inside the container; no 'wine' prefix is needed.
+    - pip install --upgrade pip
+    - pip install pyinstaller
+    - pip install -r requirements.txt
+    
+    ## 2. Run PyInstaller
+    
+    # The image is pre-configured to build a Windows executable.
+    # The default PyInstaller linker in this image is 64-bit.
+    - pyinstaller --onefile --name $APP_NAME --clean $MAIN_SCRIPT
 
-        # 5. Verification and Cleanup
-        Write-Host "Verifying build output..."
-        Get-ChildItem dist 
-        
-        Remove-Item -Recurse -Force build
-        Remove-Item "$APP_NAME.spec"
-      }
+    ## 3. Verification and Cleanup
+    
+    - echo "Verifying build output..."
+    - ls -l dist/
+    
+    - rm -rf build/
+    - rm -f $APP_NAME.spec
 
   artifacts:
     name: "$APP_NAME"
     paths:
-      - dist/
+      - dist/ # Contains the final 64-bit .exe file
     when: on_success
