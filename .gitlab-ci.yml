@@ -4,9 +4,9 @@ image: python:3.10-slim
 # Global variables that can be used throughout the pipeline
 variables:
   # The name you want for your executable file
-  APP_NAME: "my_application"
+  APP_NAME: "Toliss Cabin Announcements.exe"
   # The main Python script to convert
-  MAIN_SCRIPT: "main.py"
+  MAIN_SCRIPT: "cabinselection.py"
 
 # --- Stages Definition ---
 # Define the sequence of steps in the pipeline
@@ -51,11 +51,11 @@ build_executable:
 
   # Define the artifacts to be saved and downloadable
   artifacts:
-    name: "$APP_NAME-$CI_COMMIT_TAG"
+    name: "$APP_NAME"
     paths:
       # The executable is always placed in the 'dist' directory by PyInstaller
       - dist/
     # Ensure the artifact is only kept if the job succeeds
     when: on_success
     # The artifact will expire after 1 week (adjust as needed)
-    expire_in: 1 week
+    # expire_in: 1 week
