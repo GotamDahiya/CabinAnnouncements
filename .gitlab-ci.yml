@@ -1,60 +1,62 @@
-image: mcr.microsoft.com/windows/servercore:ltsc2022
+# Use a standard, stable Linux image with Python
+image: python:3.10-slim
 
 # Global variables
 variables:
   APP_NAME: "Toliss Test.exe"
   MAIN_SCRIPT: "cabinselection.py"
-  PYTHON_VERSION: "3.13.8" # Specify a stable Python 3.10 version
 
-# --- Stages Definition ---
+# Define the pipeline stage
 stages:
-  - build
+  - windows-executable
 
 # ----------------------------------------------------
-# Windows 64-bit PyInstaller Build Job (Requires Windows Docker Runner)
+# Windows 64-bit PyInstaller Build Job (Wine on Linux)
 # ----------------------------------------------------
-build_windows_x64_executable:
-  stage: build
- 
-   # Only run on Git tags (releases)
+create_executable:
+  stage: windows-executable
+  
+  # Only run on Git tags (releases)
   rules:
     - if: $CI_COMMIT_TAG
       when: always
 
-  # Specify the shell to use PowerShell for easier environment setup
-  shell: powershell
-
   script:
-    - Write-Host "Starting 64-bit Windows PyInstaller build..."
+    - echo "Starting cross-platform 64-bit Windows PyInstaller build using Wine..."
 
-    # 1. Download and Install Python 3.10
-    - Write-Host "Installing Python $env:PYTHON_VERSION..."
-    - Invoke-WebRequest -Uri "https://www.python.org/ftp/python/$env:PYTHON_VERSION/python-$env:PYTHON_VERSION-amd64.exe" -OutFile "C:\python_installer.exe"
-    # Execute the installer silently for all users and add to PATH
-    - Start-Process "C:\python_installer.exe" -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1" -Wait
+    ## 1. Install 64-bit Wine 🍷
     
-    # Add Python installation folder to PATH temporarily for the current job session
-    - $env:Path = "$env:Path;C:\Python$($env:PYTHON_VERSION.replace('.', ''))\;C:\Python$($env:PYTHON_VERSION.replace('.', ''))\Scripts"
-    - Write-Host "Python Path: $env:Path" # Verify path
+    # Update packages
+    - apt-get update
     
-    # 2. Install PyInstaller and Dependencies
-    - pip install --upgrade pip
-    - pip install pyinstaller
-    - pip install -r requirements.txt
-    
-    # 3. Run PyInstaller
-    # PyInstaller executed on a 64-bit Windows host produces a 64-bit EXE.
-    - pyinstaller --onefile --name $env:APP_NAME --clean $env:MAIN_SCRIPT
+    # Install standard 64-bit Wine. No need for dpkg --add-architecture i386.
+    - apt-get install -y --no-install-recommends wine
 
-    # 4. Verification and Cleanup (using PowerShell commands)
-    - Write-Host "Verifying build output..."
-    - Get-ChildItem dist
+    # Set the Wine environment to 64-bit (win64) explicitly
+    - WINEARCH=win64 winecfg # Initializes the Wine prefix as 64-bit
+
+    ## 2. Install Python Dependencies *inside* the Wine environment
     
-    - Remove-Item -Recurse -Force build
-    - Remove-Item "$env:APP_NAME.spec"
+    # The 'wine python -m pip' structure installs Windows-compatible dependencies.
+    - wine python -m pip install --upgrade pip
+    - wine python -m pip install pyinstaller
+    - wine python -m pip install -r requirements.txt
+    
+    ## 3. Run PyInstaller
+    
+    # PyInstaller executed within the win64 environment will produce a 64-bit EXE.
+    - wine pyinstaller --onefile --name $APP_NAME --clean $MAIN_SCRIPT
+
+    ## 4. Verification and Cleanup
+    
+    - echo "Verifying build output..."
+    - ls -l dist/
+    
+    - rm -rf build/
+    - rm -f $APP_NAME.spec
 
   artifacts:
-    name: "$env:APP_NAME"
+    name: "$APP_NAME"
     paths:
-      - dist/
+      - dist/ # Contains the final .exe file
     when: on_success
