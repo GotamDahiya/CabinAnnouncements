@@ -30,9 +30,9 @@ create_executable:
     
     - dpkg --add-architecture i386
 
-    - apt-get install -y --no-install-recommends wine
+    - apt-get install -y --no-install-recommends wine wine32:i386
     # Set the Wine environment to 64-bit (win64) explicitly
-    - WINEARCH=win64 winecfg # Initializes the Wine prefix as 64-bit
+    # - WINEARCH=win64 winecfg # Initializes the Wine prefix as 64-bit
 
     ## 2. Install Python Dependencies *inside* the Wine environment
     
