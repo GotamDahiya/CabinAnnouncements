@@ -1,57 +1,63 @@
-# Use a Microsoft Windows Server Core image with Python pre-installed.
-# This image is large and requires a Windows-based GitLab Runner.
-image: mcr.microsoft.com/windows/servercore:ltsc2022-py310
+# Use a Docker image that includes Python and Wine (e.g., a custom or readily available Wine/PyInstaller image)
+# This example uses a standard Python image and installs Wine, or you can use a pre-built image like:
+# image: cdgriffith/pyinstaller-wine-builder
+image: python:3.10-slim
 
 # Global variables
 variables:
-  APP_NAME: "Toliss Cabin Announcements.exe"
+  APP_NAME: "Toliss Cabin Announcements-Test.exe"
   MAIN_SCRIPT: "cabinselection.py"
+  # Set architecture for Wine to target 32-bit Windows executables (common default)
+  WINEARCH: "win32" 
 
 # --- Stages Definition ---
 stages:
   - build
 
 # ----------------------------------
-# Windows 64-bit PyInstaller Build Job
+# Windows PyInstaller Build Job
 # ----------------------------------
-build_windows_x64_executable:
+build_windows_executable:
   stage: build
-  
   # Only run on Git tags (releases)
   rules:
     - if: $CI_COMMIT_TAG
       when: always
 
   script:
-    - echo "Starting 64-bit Windows PyInstaller build for tag %CI_COMMIT_TAG%..."
-    
-    # 1. Install Dependencies
-    # In Windows environment, use 'pip' directly.
-    # Note: Use PowerShell syntax if your Windows image defaults to it. Below uses cmd/batch syntax.
-    - python -m pip install --upgrade pip
-    - pip install pyinstaller
-    - pip install -r requirements.txt
-    
-    # 2. Run PyInstaller for 64-bit
-    # By default, running PyInstaller on a 64-bit Windows OS/Container creates a 64-bit executable.
-    # The '--onefile' option creates a single .exe.
-    - pyinstaller --onefile --name %APP_NAME% --clean %MAIN_SCRIPT%
+    - echo "Starting Windows PyInstaller build for tag $CI_COMMIT_TAG using Wine..."
 
-    # 3. Verification
+    # 1. Install Dependencies for Wine (Standard for Debian/Ubuntu based images)
+    # Update and install Wine. This can take a few minutes.
+    - apt-get update && apt-get install -y --no-install-recommends wine
+
+    # 2. Configure Python Dependencies (Run these under Wine)
+    # The 'wine python -m pip' structure ensures that pip runs inside the emulated Windows environment.
+    - wine python -m pip install --upgrade pip
+    - wine python -m pip install pyinstaller
+    - wine python -m pip install -r requirements.txt
+    
+    # 3. Run PyInstaller
+    # PyInstaller is executed via Wine. It automatically targets the architecture
+    # defined by the Wine environment (defaulting to Windows).
+    # The output executable will be named 'my_application.exe'
+    - wine pyinstaller --onefile --name $APP_NAME --clean $MAIN_SCRIPT
+
+    # 4. Verification
     - echo "Verifying build output..."
-    - dir dist
-    
-    # 4. Cleanup
-    - rmdir /s /q build
-    - del "%APP_NAME%.spec"
+    # The output is still placed in the 'dist' directory
+    - ls -l dist/
 
-    - echo "64-bit Windows build completed successfully. Executable is %APP_NAME%.exe"
+    # 5. Cleanup
+    - rm -rf build/
+    - rm -f $APP_NAME.spec
+
+    - echo "Windows build completed successfully. Executable is $APP_NAME.exe"
 
   # Define the artifacts to be saved
   artifacts:
-    name: "%APP_NAME%"
+    name: "$APP_NAME"
     paths:
-      # The output path is the same regardless of OS
       - dist/
     when: on_success
-    # Artifacts will be kept indefinitely
+    # Artifacts will be kept indefinitely (as requested previously)
