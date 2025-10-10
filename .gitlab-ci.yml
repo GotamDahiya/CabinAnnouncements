@@ -30,7 +30,7 @@ create_executable:
     
     - dpkg --add-architecture i386
 
-    - apt-get install wine wine32:i386
+    - apt-get install wine
     # Set the Wine environment to 64-bit (win64) explicitly
     - WINEARCH=win64 winecfg # Initializes the Wine prefix as 64-bit
 
