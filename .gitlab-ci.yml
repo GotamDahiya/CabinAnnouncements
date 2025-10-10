@@ -1,6 +1,6 @@
 # Use a Python image specifically built for cross-compilation with MinGW
 # Replace '3.10' with your desired base Python version (e.g., '3.11', '3.9')
-image: cdgriffith/pyinstaller-windows:python-3.10
+image: batonogov/pyinstaller-windows:latest
 
 # Global variables
 variables:

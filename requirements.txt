@@ -1,1 +1,2 @@
 python_ffmpeg==2.0.12
+pyinstaller=6.16.0
