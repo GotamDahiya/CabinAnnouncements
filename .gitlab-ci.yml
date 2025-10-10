@@ -1,7 +1,3 @@
-# Use a Python image specifically built for cross-compilation with MinGW
-# Replace '3.10' with your desired base Python version (e.g., '3.11', '3.9')
-image: batonogov/pyinstaller-windows:latest
-
 # Global variables
 variables:
   APP_NAME: "Toliss Test.exe"
@@ -10,19 +6,11 @@ variables:
   # The image automatically handles the cross-compilation environment.
   TARGET_ARCH: "64bit" 
 
-# Define the pipeline stage
-stages:
-  - build
-
-# ----------------------------------------------------
-# Windows 64-bit PyInstaller Build Job (MinGW/Cross-Compiler)
-# ----------------------------------------------------
-build_windows_x64_executable:
-  stage: build
-  
-  # This job runs on any standard Linux/Docker runner
-  # tags:
-  #   - docker
+windows_bin:
+  stage: deploy
+  image:
+    name: batonogov/pyinstaller-windows:latest
+    entrypoint: ['']
 
   # Only run on Git tags (releases)
   rules:
@@ -30,30 +18,13 @@ build_windows_x64_executable:
       when: always
 
   script:
-    - echo "Starting cross-platform $TARGET_ARCH Windows build using MinGW toolchain..."
-
-    ## 1. Install Dependencies
-    # Pip is run natively inside the container; no 'wine' prefix is needed.
-    - pip install --upgrade pip
-    - pip install pyinstaller
+    - echo "Creating Windows artifact"
     - pip install -r requirements.txt
+    - pyinstaller --onefile --name $APP_NAME $MAIN_SCRIPT
     
-    ## 2. Run PyInstaller
-    
-    # The image is pre-configured to build a Windows executable.
-    # The default PyInstaller linker in this image is 64-bit.
-    - pyinstaller --onefile --name $APP_NAME --clean $MAIN_SCRIPT
-
-    ## 3. Verification and Cleanup
-    
-    - echo "Verifying build output..."
-    - ls -l dist/
-    
-    - rm -rf build/
-    - rm -f $APP_NAME.spec
-
+  rules:
+    - when: always
   artifacts:
-    name: "$APP_NAME"
     paths:
-      - dist/ # Contains the final 64-bit .exe file
+      - dist/
     when: on_success
