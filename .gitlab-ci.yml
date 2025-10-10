@@ -22,8 +22,6 @@ windows_bin:
     - pip install -r requirements.txt
     - pyinstaller --onefile --name $APP_NAME $MAIN_SCRIPT
     
-  rules:
-    - when: always
   artifacts:
     paths:
       - dist/
