@@ -1,0 +1,61 @@
+# Define the base Docker image for the job. Using a Python image is recommended.
+image: python:3.10-slim
+
+# Global variables that can be used throughout the pipeline
+variables:
+  # The name you want for your executable file
+  APP_NAME: "my_application"
+  # The main Python script to convert
+  MAIN_SCRIPT: "main.py"
+
+# --- Stages Definition ---
+# Define the sequence of steps in the pipeline
+stages:
+  - build
+
+# ==================================
+# PyInstaller Build Job
+# ==================================
+build_executable:
+  stage: build
+  # The job should only run when a Git tag is created (i.e., a release)
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: always
+
+  script:
+    - echo "Starting PyInstaller build for tag $CI_COMMIT_TAG..."
+
+    # 1. Install Dependencies
+    # Upgrade pip and install PyInstaller and your project dependencies
+    - pip install --upgrade pip
+    - pip install pyinstaller
+    # Assuming your project has a requirements.txt file
+    - pip install -r requirements.txt
+
+    # 2. Run PyInstaller
+    # The 'onefile' option creates a single executable file.
+    # The 'name' option sets the name of the executable.
+    # Add '--hidden-import=module_name' if PyInstaller fails to find certain modules automatically.
+    - pyinstaller --onefile --name $APP_NAME $MAIN_SCRIPT
+
+    # 3. Verification (Optional but Recommended)
+    - echo "Verifying build output..."
+    - ls -l dist/
+
+    # 4. Cleanup (Optional: Remove the temporary 'build' directory and 'spec' file)
+    - rm -rf build/
+    - rm -f $APP_NAME.spec
+
+    - echo "Build completed successfully."
+
+  # Define the artifacts to be saved and downloadable
+  artifacts:
+    name: "$APP_NAME-$CI_COMMIT_TAG"
+    paths:
+      # The executable is always placed in the 'dist' directory by PyInstaller
+      - dist/
+    # Ensure the artifact is only kept if the job succeeds
+    when: on_success
+    # The artifact will expire after 1 week (adjust as needed)
+    expire_in: 1 week
