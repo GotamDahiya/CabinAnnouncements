@@ -1,5 +1,5 @@
 # Use a standard, stable Linux image with Python
-image: python:3.10-slim
+image: ubuntu:22.04
 
 # Global variables
 variables:
@@ -23,16 +23,18 @@ create_executable:
 
   script:
     - echo "Starting cross-platform 64-bit Windows PyInstaller build using Wine..."
-
+    # Install pip from python
+    - wget https://bootstrap.pypa.io/get-pip.py
+    - python3 get-pip.py
+    
     # Update packages
     - apt-get update
     
-    
     - dpkg --add-architecture i386
 
-    - apt-get install -y --no-install-recommends wine wine32
+    - apt-get install -y --no-install-recommends wine wine32:i386
     # Set the Wine environment to 64-bit (win64) explicitly
-    # - WINEARCH=win64 winecfg # Initializes the Wine prefix as 64-bit
+    - WINEARCH=win32 winecfg # Initializes the Wine prefix as 64-bit
 
     ## 2. Install Python Dependencies *inside* the Wine environment
     
