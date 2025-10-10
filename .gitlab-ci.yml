@@ -17,11 +17,6 @@ stages:
 build_windows_x64_executable:
   stage: build
   
-  # CRITICAL: This tag ensures the job is routed to a Windows runner.
-  # Adjust 'windows' if your specific runner has a different tag (e.g., 'windows-docker').
-  tags:
-    - windows
-
   # Only run on Git tags (releases)
   rules:
     - if: $CI_COMMIT_TAG
