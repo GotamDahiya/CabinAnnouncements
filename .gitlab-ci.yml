@@ -24,15 +24,13 @@ create_executable:
   script:
     - echo "Starting cross-platform 64-bit Windows PyInstaller build using Wine..."
 
-    ## 1. Install 64-bit Wine 🍷
-    
     # Update packages
     - apt-get update
     
     
     - dpkg --add-architecture i386
 
-    - apt-get install wine-stable
+    - apt-get install wine wine32:i386
     # Set the Wine environment to 64-bit (win64) explicitly
     - WINEARCH=win64 winecfg # Initializes the Wine prefix as 64-bit
 
