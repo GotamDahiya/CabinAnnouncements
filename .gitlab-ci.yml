@@ -29,9 +29,10 @@ create_executable:
     # Update packages
     - apt-get update
     
-    # Install standard 64-bit Wine. No need for dpkg --add-architecture i386.
-    - apt-get install -y --no-install-recommends wine
+    
+    - sudo dpkg --add-architecture i386
 
+    - sudo apt-get install wine-stable
     # Set the Wine environment to 64-bit (win64) explicitly
     - WINEARCH=win64 winecfg # Initializes the Wine prefix as 64-bit
 
