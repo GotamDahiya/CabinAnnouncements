@@ -23,13 +23,15 @@ create_executable:
 
   script:
     - echo "Starting cross-platform 64-bit Windows PyInstaller build using Wine..."
+    # Update packages
+    - apt-get update
+
     # Install pip from python
+    - apt-get install -y wget
     - wget https://bootstrap.pypa.io/get-pip.py
     - python3 get-pip.py
     
-    # Update packages
-    - apt-get update
-    
+    # Installing wine
     - dpkg --add-architecture i386
 
     - apt-get install -y --no-install-recommends wine wine32:i386
