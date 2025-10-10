@@ -1,63 +1,60 @@
-# Use a Docker image that includes Python and Wine (e.g., a custom or readily available Wine/PyInstaller image)
-# This example uses a standard Python image and installs Wine, or you can use a pre-built image like:
-# image: cdgriffith/pyinstaller-wine-builder
-image: python:3.10-slim
+image: mcr.microsoft.com/windows/servercore:ltsc2022
 
 # Global variables
 variables:
-  APP_NAME: "Toliss Cabin Announcements-Test.exe"
+  APP_NAME: "Toliss Test.exe"
   MAIN_SCRIPT: "cabinselection.py"
-  # Set architecture for Wine to target 32-bit Windows executables (common default)
-  WINEARCH: "win32" 
+  PYTHON_VERSION: "3.13.8" # Specify a stable Python 3.10 version
 
 # --- Stages Definition ---
 stages:
   - build
 
-# ----------------------------------
-# Windows PyInstaller Build Job
-# ----------------------------------
-build_windows_executable:
+# ----------------------------------------------------
+# Windows 64-bit PyInstaller Build Job (Requires Windows Docker Runner)
+# ----------------------------------------------------
+build_windows_x64_executable:
   stage: build
-  # Only run on Git tags (releases)
+ 
+   # Only run on Git tags (releases)
   rules:
     - if: $CI_COMMIT_TAG
       when: always
 
+  # Specify the shell to use PowerShell for easier environment setup
+  shell: powershell
+
   script:
-    - echo "Starting Windows PyInstaller build for tag $CI_COMMIT_TAG using Wine..."
+    - Write-Host "Starting 64-bit Windows PyInstaller build..."
 
-    # 1. Install Dependencies for Wine (Standard for Debian/Ubuntu based images)
-    # Update and install Wine. This can take a few minutes.
-    - apt-get update && apt-get install -y --no-install-recommends wine
-
-    # 2. Configure Python Dependencies (Run these under Wine)
-    # The 'wine python -m pip' structure ensures that pip runs inside the emulated Windows environment.
-    - wine python -m pip install --upgrade pip
-    - wine python -m pip install pyinstaller
-    - wine python -m pip install -r requirements.txt
+    # 1. Download and Install Python 3.10
+    - Write-Host "Installing Python $env:PYTHON_VERSION..."
+    - Invoke-WebRequest -Uri "https://www.python.org/ftp/python/$env:PYTHON_VERSION/python-$env:PYTHON_VERSION-amd64.exe" -OutFile "C:\python_installer.exe"
+    # Execute the installer silently for all users and add to PATH
+    - Start-Process "C:\python_installer.exe" -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1" -Wait
+    
+    # Add Python installation folder to PATH temporarily for the current job session
+    - $env:Path = "$env:Path;C:\Python$($env:PYTHON_VERSION.replace('.', ''))\;C:\Python$($env:PYTHON_VERSION.replace('.', ''))\Scripts"
+    - Write-Host "Python Path: $env:Path" # Verify path
+    
+    # 2. Install PyInstaller and Dependencies
+    - pip install --upgrade pip
+    - pip install pyinstaller
+    - pip install -r requirements.txt
     
     # 3. Run PyInstaller
-    # PyInstaller is executed via Wine. It automatically targets the architecture
-    # defined by the Wine environment (defaulting to Windows).
-    # The output executable will be named 'my_application.exe'
-    - wine pyinstaller --onefile --name $APP_NAME --clean $MAIN_SCRIPT
+    # PyInstaller executed on a 64-bit Windows host produces a 64-bit EXE.
+    - pyinstaller --onefile --name $env:APP_NAME --clean $env:MAIN_SCRIPT
 
-    # 4. Verification
-    - echo "Verifying build output..."
-    # The output is still placed in the 'dist' directory
-    - ls -l dist/
+    # 4. Verification and Cleanup (using PowerShell commands)
+    - Write-Host "Verifying build output..."
+    - Get-ChildItem dist
+    
+    - Remove-Item -Recurse -Force build
+    - Remove-Item "$env:APP_NAME.spec"
 
-    # 5. Cleanup
-    - rm -rf build/
-    - rm -f $APP_NAME.spec
-
-    - echo "Windows build completed successfully. Executable is $APP_NAME.exe"
-
-  # Define the artifacts to be saved
   artifacts:
-    name: "$APP_NAME"
+    name: "$env:APP_NAME"
     paths:
       - dist/
     when: on_success
-    # Artifacts will be kept indefinitely (as requested previously)
