@@ -27,6 +27,7 @@ create_executable:
     - apt-get update
 
     # Install pip from python
+    - apt-get install -y python3
     - apt-get install -y wget
     - wget https://bootstrap.pypa.io/get-pip.py
     - python3 get-pip.py
