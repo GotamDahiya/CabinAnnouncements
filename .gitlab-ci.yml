@@ -53,4 +53,4 @@ create_release:
       links:
         - name: "$APP_NAME"
           url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$APP_NAME_BASE.exe?job=windows_bin
-          filepath: ./"$APP_NAME"    
+          filepath: "$APP_NAME"
