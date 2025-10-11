@@ -52,5 +52,5 @@ create_release:
     assets:
       links:
         - name: "$APP_NAME"
-          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$APP_NAME?job=windows_bin
+          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/${APP_NAME// /%20}?job=windows_bin
           filepath: "$APP_NAME"
