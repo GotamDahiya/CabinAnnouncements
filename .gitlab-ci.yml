@@ -41,6 +41,7 @@ create_release:
   script:
     - echo "Creating release for tag $CI_COMMIT_TAG"
     - echo $pwd
+    - ls
 
   release:
     tag_name: $CI_COMMIT_TAG
