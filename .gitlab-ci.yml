@@ -2,10 +2,8 @@
 variables:
   APP_NAME: "Toliss Cabin Announements.exe"
   MAIN_SCRIPT: "cabinselection.py"
-  # Set the target architecture here: 64bit is the default.
-  # The image automatically handles the cross-compilation environment.
-  TARGET_ARCH: "64bit" 
-
+  RELEASE_FLAG: "false"
+  
 windows_bin:
   stage: deploy
   image:
@@ -27,3 +25,26 @@ windows_bin:
     paths:
       - '*.exe'
     when: on_success
+
+create_release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: on_success
+
+  script:
+    - echo "Creating release for tag $CI_COMMIT_TAG"
+
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: "Release $CI_COMMIT_TAG"
+
+    decription: "Automated release for cabin announcements switcher with tag $CI_COMMIT_TAG"
+
+    assets:
+      links:
+        - name: "$APP_NAME"
+          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$APP_NAME_BASE.exe?job=windows_bin
+          filepath: /"$APP_NAME"    
