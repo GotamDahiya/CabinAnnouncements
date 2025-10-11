@@ -41,7 +41,7 @@ create_release:
     tag_name: $CI_COMMIT_TAG
     name: "Release $CI_COMMIT_TAG"
 
-    decription: "Automated release for cabin announcements switcher with tag $CI_COMMIT_TAG"
+    description: "Automated release for cabin announcements switcher with tag $CI_COMMIT_TAG"
 
     assets:
       links:
