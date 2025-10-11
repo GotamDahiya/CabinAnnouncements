@@ -3,9 +3,13 @@ variables:
   APP_NAME: "Toliss Cabin Announements.exe"
   MAIN_SCRIPT: "cabinselection.py"
   RELEASE_FLAG: "false"
-  
+
+stages:
+  - build
+  - release
+
 windows_bin:
-  stage: deploy
+  stage: build
   image:
     name: batonogov/pyinstaller-windows:latest
     entrypoint: ['']
