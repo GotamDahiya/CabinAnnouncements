@@ -1,6 +1,7 @@
 # Global variables
 variables:
   APP_NAME: "Toliss Cabin Announements.exe"
+  APP_NAME_CLEAN : "TolissCabinAnnouncements.exe"
   MAIN_SCRIPT: "cabinselection.py"
   RELEASE_FLAG: "false"
 
@@ -22,10 +23,10 @@ windows_bin:
   script:
     - echo "Creating Windows artifact"
     - pip install -r requirements.txt
-    - pyinstaller --onefile --name "$APP_NAME" $MAIN_SCRIPT
+    - pyinstaller --onefile --name "$APP_NAME_CLEAN" $MAIN_SCRIPT
     - cp ./dist/*.exe .
   artifacts:
-    name: "$APP_NAME"
+    name: "$APP_NAME_CLEAN"
     paths:
       - '*.exe'
     when: on_success
@@ -52,5 +53,5 @@ create_release:
     assets:
       links:
         - name: "$APP_NAME"
-          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/${APP_NAME// /%20}?job=windows_bin
-          filepath: "$APP_NAME"
+          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$APP_NAME_CLEAN?job=windows_bin
+          filepath: /$APP_NAME_CLEAN
