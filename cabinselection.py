@@ -9,7 +9,7 @@ import shutil
 class FolderBrowserApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Toliss Cabin Announcements")
+        self.title("Cabin Announcements")
         self.geometry("800x450")
         
         # Configure the main window grid
@@ -36,7 +36,7 @@ class SelectCabinAnnouncementSource(ttk.Frame):
         self.grid_columnconfigure(0, weight=1)
         
         # 1. Title Label
-        title_label = ttk.Label(self, text="Toliss Cabin Announcements", font=("Arial", 14, "bold"))
+        title_label = ttk.Label(self, text="Cabin Announcements", font=("Arial", 14, "bold"))
         title_label.grid(row=0, column=0, pady=(0, 10), sticky="w")
 
         # 2. Selection Button and Path Display Frame
