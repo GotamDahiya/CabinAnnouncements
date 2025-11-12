@@ -1,7 +1,7 @@
 # Global variables
 variables:
-  APP_NAME: "Toliss Cabin Announements.exe"
-  APP_NAME_CLEAN : "TolissCabinAnnouncements.exe"
+  APP_NAME: "Cabin Announements.exe"
+  APP_NAME_CLEAN : "CabinAnnouncements.exe"
   MAIN_SCRIPT: "cabinselection.py"
   RELEASE_FLAG: "false"
 
