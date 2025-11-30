@@ -4,6 +4,7 @@ variables:
   APP_NAME_CLEAN : "CabinAnnouncements.exe"
   MAIN_SCRIPT: "cabinselection.py"
   RELEASE_FLAG: "false"
+  LUA_SCRIPT: "cabinannouncements.lua"
 
 stages:
   - build
@@ -55,3 +56,7 @@ create_release:
         - name: "$APP_NAME"
           url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$APP_NAME_CLEAN?job=windows_bin
           filepath: /$APP_NAME_CLEAN
+      links:
+        - name: "$LUA_SCRIPT"
+          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/blob/$CI_COMMIT_TAG/$LUA_SCRIPT
+          filepath: /$LUA_SCRIPT
