@@ -3,6 +3,8 @@ Lib/
 Scripts/
 share/
 
-# Build Folders
+# Build 
 dist/
 build/
+*.exe.spec
+*.exe
