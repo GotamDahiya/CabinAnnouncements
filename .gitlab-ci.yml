@@ -27,10 +27,15 @@ windows_bin:
     - pyinstaller --onefile --windowed --noconsole --name "$APP_NAME_CLEAN" $MAIN_SCRIPT
     - cp ./dist/*.exe .
   artifacts:
-    name: "$APP_NAME_CLEAN"
-    paths:
-      - '*.exe'
-    when: on_success
+    - name: "$APP_NAME_CLEAN"
+      paths:
+        - '*.exe'
+      when: on_success
+    - name: "$LUA_SCRIPT"
+      paths:
+        - 'cabinannouncements.lua'
+      when: on_success
+
 
 create_release:
   stage: release
