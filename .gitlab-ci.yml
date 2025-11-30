@@ -61,7 +61,6 @@ create_release:
         - name: "$APP_NAME"
           url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$APP_NAME_CLEAN?job=windows_bin
           filepath: /$APP_NAME_CLEAN
-      links:
         - name: "$LUA_SCRIPT"
           url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$LUA_SCRIPT?job=windows_bin
           filepath: /$LUA_SCRIPT
