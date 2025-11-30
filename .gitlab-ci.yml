@@ -23,7 +23,7 @@ windows_bin:
   script:
     - echo "Creating Windows artifact"
     - pip install -r requirements.txt
-    - pyinstaller --onefile --name "$APP_NAME_CLEAN" $MAIN_SCRIPT
+    - pyinstaller --onefile --windowed --name "$APP_NAME_CLEAN" $MAIN_SCRIPT
     - cp ./dist/*.exe .
   artifacts:
     name: "$APP_NAME_CLEAN"
