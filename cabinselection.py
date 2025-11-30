@@ -5,6 +5,29 @@ import glob
 from pathlib import Path
 from ffmpeg import FFmpeg
 import shutil
+import subprocess
+from functools import wraps
+
+__old_Popen = subprocess.Popen
+@wraps(__old_Popen)
+def new_Popen(*args, startupinfo=None, **kwargs):
+    if startupinfo is None:
+        startupinfo = subprocess.STARTUPINFO()
+
+    # way 1, as SO suggests:
+    # create window
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    # and hide it immediately
+    startupinfo.wShowWindow = subprocess.SW_HIDE
+
+    # way 2, I cann't test it but you may try just:
+    # startupinfo.dwFlags = subprocess.CREATE_NO_WINDOW
+
+    return __old_Popen(*args, startupinfo=startupinfo, **kwargs)
+
+
+# monkey-patch/replace Popen
+subprocess.Popen = new_Popen
 
 class FolderBrowserApp(tk.Tk):
     def __init__(self):
@@ -185,7 +208,7 @@ class SelectCabinAnnouncementSource(ttk.Frame):
 
     def handle_final_selection(self, selected_path):
         """Action performed when a subfolder is finalized."""
-        print(f"Final Folder Selected: {selected_path}")
+        # print(f"Final Folder Selected: {selected_path}")
         files = glob.glob(selected_path + "/*.ogg")
 
         _= [os.remove(file) for file in glob.glob(self.destination_folder_path + "/*.wav")]
@@ -199,7 +222,7 @@ class SelectCabinAnnouncementSource(ttk.Frame):
             ffmpeg = (FFmpeg().option("y").input(filepath).output(output_filepath))
             ffmpeg.execute()
 
-            print(destination_filepath)
+            # print(destination_filepath)
             shutil.move(output_filepath, destination_filepath)
         
         tk.messagebox.showinfo("Process Complete", f"Finished creating ogg files from {Path(selected_path).name} and transferred to destination folder {Path(self.destination_folder_path).name}")
