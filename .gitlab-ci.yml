@@ -31,10 +31,6 @@ windows_bin:
       paths:
         - '*.exe'
       when: on_success
-    - name: "$LUA_SCRIPT"
-      paths:
-        - 'cabinannouncements.lua'
-      when: on_success
 
 
 create_release:
@@ -61,6 +57,3 @@ create_release:
         - name: "$APP_NAME"
           url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$APP_NAME_CLEAN?job=windows_bin
           filepath: /$APP_NAME_CLEAN
-        - name: "$LUA_SCRIPT"
-          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$LUA_SCRIPT?job=windows_bin
-          filepath: /$LUA_SCRIPT
