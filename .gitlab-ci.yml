@@ -58,5 +58,5 @@ create_release:
           filepath: /$APP_NAME_CLEAN
       links:
         - name: "$LUA_SCRIPT"
-          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/blob/$CI_COMMIT_TAG/$LUA_SCRIPT
+          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/artifacts/$CI_COMMIT_TAG/file/$LUA_SCRIPT
           filepath: /$LUA_SCRIPT
