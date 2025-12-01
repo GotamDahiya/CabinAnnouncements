@@ -31,11 +31,11 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller -r requirements.txt 
+          pip install -r requirements.txt 
 
       - name: Run PyInstaller
         # Uses the EXECUTABLE_NAME environment variable
-        run: pyinstaller --onefile cabinselection.py --name ${{ env.EXECUTABLE_NAME }}
+        run: pyinstaller --onefile --windowed --noconsole --name ${{ env.EXECUTABLE_NAME }} cabinselection.py
 
       - name: Upload Windows Executable Artifact
         if: runner.os == 'Windows'
