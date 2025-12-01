@@ -41,6 +41,7 @@ jobs:
         run: pyinstaller --onefile --windowed --noconsole --name ${{ env.EXECUTABLE_NAME }} cabinselection.py
 
       - name: Upload Windows Executable Artifact
+        if: runner.os == "Windows"
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.EXECUTABLE_NAME }}.exe
