@@ -6,8 +6,8 @@ on:
     tags:
       - 'v*.*.*' # Trigger for tags like v1.0.0, v2.5.1, etc.
 
-# permissions:
-#   contents: write
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -71,13 +71,15 @@ jobs:
         id: get_version
         run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
         
-      - name: ✨ Create Release and Attach Assets
+      - name: Create Release and Attach Assets
         uses: softprops/action-gh-release@v2
+        env:
+          # GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           # Tag name is automatically used by default
           tag_name: ${{ steps.get_version.outputs.TAG_NAME }}
           name: Release ${{ steps.get_version.outputs.TAG_NAME }}
-          token: ${{ secrets.ReleaseToken }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           # Target is the commit SHA that the tag points to
           # target_commitish: ${{ github.sha }}
           # Attach ALL files found in the 'artifacts' directory
