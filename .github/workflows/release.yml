@@ -45,14 +45,14 @@ jobs:
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.EXECUTABLE_NAME }}.exe
+          name: ${{ env.EXECUTABLE_NAME }}-Windows
           path: dist/${{ env.EXECUTABLE_NAME }}.exe
 
       - name: Upload Linux Executable Artifact
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.EXECUTABLE_NAME }}
+          name: ${{ env.EXECUTABLE_NAME }}-Linux
           path: dist/${{ env.EXECUTABLE_NAME }}
           
   # 2. New Job: Collects artifacts and creates the release
@@ -63,6 +63,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.0
+        with:
+          fetch-depth: 1
+
       - name: Download All Build Artifacts
         uses: actions/download-artifact@v4
         with:
