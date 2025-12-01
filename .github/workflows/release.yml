@@ -82,8 +82,6 @@ jobs:
       # - name: List all files
       #   run : tree ../
       
-      - name: Copy cabinannouncements.lua
-        run: cp /cabinannouncements
       - name: Create Release and Attach Assets
         uses: softprops/action-gh-release@v2.5.0
         # env:
