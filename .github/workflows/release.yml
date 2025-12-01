@@ -83,4 +83,7 @@ jobs:
           # Target is the commit SHA that the tag points to
           # target_commitish: ${{ github.sha }}
           # Attach ALL files found in the 'artifacts' directory
-          files: artifacts/**/*
+          files: | 
+            artifacts/**/*
+            cabinannouncements.lua
+          generate_release_notes: true
