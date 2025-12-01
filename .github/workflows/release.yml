@@ -73,7 +73,7 @@ jobs:
         
       - name: Create Release and Attach Assets
         uses: softprops/action-gh-release@v2
-        env:
+        # env:
           # GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           # Tag name is automatically used by default
