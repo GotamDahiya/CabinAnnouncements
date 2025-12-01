@@ -16,7 +16,7 @@ jobs:
     
     # Define the base name for the executable here
     env:
-      EXECUTABLE_NAME: my_app
+      EXECUTABLE_NAME: CabinAnnouncements
       
     steps:
       - name: Checkout Repository
@@ -33,9 +33,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller -r requirements.txt 
 
-      - name: 📦 Run PyInstaller
+      - name: Run PyInstaller
         # Uses the EXECUTABLE_NAME environment variable
-        run: pyinstaller --onefile your_script_name.py --name ${{ env.EXECUTABLE_NAME }}
+        run: pyinstaller --onefile cabinselection.py --name ${{ env.EXECUTABLE_NAME }}
 
       - name: Upload Windows Executable Artifact
         if: runner.os == 'Windows'
