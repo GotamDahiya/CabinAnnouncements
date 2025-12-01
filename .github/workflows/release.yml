@@ -5,14 +5,17 @@ on:
   push:
     tags:
       - 'v*.*.*' # Trigger for tags like v1.0.0, v2.5.1, etc.
-  
+
+permissions:
+  contents: write
+
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
+    # strategy:
+    #   matrix:
+    #     os: [windows-latest, ubuntu-latest]
     
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     
     # Define the base name for the executable here
     env:
@@ -35,22 +38,20 @@ jobs:
 
       - name: Run PyInstaller
         # Uses the EXECUTABLE_NAME environment variable
-        run: pyinstaller --onefile --windowed --noconsole --name ${{ env.EXECUTABLE_NAME }} cabinselection.py
+        run: pyinstaller --onefile --windowed --noconsole --name ${{ env.EXECUTABLE_NAME }}.exe cabinselection.py
 
       - name: Upload Windows Executable Artifact
-        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          # Naming the artifact with the tag version and OS for clarity
           name: ${{ env.EXECUTABLE_NAME }}.exe
           path: dist/${{ env.EXECUTABLE_NAME }}.exe
 
-      - name: Upload Linux Executable Artifact
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.EXECUTABLE_NAME }}
-          path: dist/${{ env.EXECUTABLE_NAME }}
+      # - name: Upload Linux Executable Artifact
+      #   if: runner.os == 'Linux'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ env.EXECUTABLE_NAME }}
+      #     path: dist/${{ env.EXECUTABLE_NAME }}
           
   # 2. New Job: Collects artifacts and creates the release
   release:
@@ -77,10 +78,7 @@ jobs:
           tag_name: ${{ steps.get_version.outputs.TAG_NAME }}
           name: Release ${{ steps.get_version.outputs.TAG_NAME }}
           # Target is the commit SHA that the tag points to
-          target_commitish: ${{ github.sha }}
+          # target_commitish: ${{ github.sha }}
           # Attach ALL files found in the 'artifacts' directory
           files: artifacts/**/*
-          draft: false
-          prerelease: false
-          # Generate a descriptive changelog from the commit history
-          generate_release_notes: true
+          token : ${{ secrets.ReleaseToken }}
