@@ -79,24 +79,24 @@ jobs:
         run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
         
 
-      - name: List all files
-        run : tree ../
+      # - name: List all files
+      #   run : tree ../
       
-      # - name: Copy cabinannouncements.lua
-      #   run: cp /cabinannouncements
-      # - name: Create Release and Attach Assets
-      #   uses: softprops/action-gh-release@v2.5.0
-      #   # env:
-      #     # GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-      #   with:
-      #     # Tag name is automatically used by default
-      #     tag_name: ${{ steps.get_version.outputs.TAG_NAME }}
-      #     name: Release ${{ steps.get_version.outputs.TAG_NAME }}
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     # Target is the commit SHA that the tag points to
-      #     # target_commitish: ${{ github.sha }}
-      #     # Attach ALL files found in the 'artifacts' directory
-      #     files: | 
-      #       artifacts/**/*
-      #       cabinannouncements.lua
-      #     generate_release_notes: true
+      - name: Copy cabinannouncements.lua
+        run: cp /cabinannouncements
+      - name: Create Release and Attach Assets
+        uses: softprops/action-gh-release@v2.5.0
+        # env:
+          # GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          # Tag name is automatically used by default
+          tag_name: ${{ steps.get_version.outputs.TAG_NAME }}
+          name: Release ${{ steps.get_version.outputs.TAG_NAME }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Target is the commit SHA that the tag points to
+          # target_commitish: ${{ github.sha }}
+          # Attach ALL files found in the 'artifacts' directory
+          files: | 
+            artifacts/**/*
+            cabinannouncements.lua
+          generate_release_notes: true
