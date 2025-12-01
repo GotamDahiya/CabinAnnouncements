@@ -73,7 +73,7 @@ jobs:
         run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
         
       - name: Create Release and Attach Assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.5.0
         # env:
           # GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
