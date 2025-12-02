@@ -11,22 +11,22 @@ local toliss_announcements_dir = SCRIPT_DIRECTORY .. "Toliss_Announcements/"
 -- VARIABLES FOR CONTROLLING THE SOUND. THESE ARE THE DEFAULT VALUES AND CAN BE CHANGED VIA SLIDERS IN THE IMGUI WINDOW
 -- Range : +/- 20 dB
 local capt_master_volume = -3
-local capt_boarding_complete = -3 -- BoardingComplete [MANUAL]
-local capt_gate_departure = -3 -- ArmDoors [MANUAL]
-local capt_before_takeoff = -3 -- CallCabinSecureTakeoff [MANUAL]
+local capt_boarding_complete = -3  -- BoardingComplete [MANUAL]
+local capt_gate_departure = -3     -- ArmDoors [MANUAL]
+local capt_before_takeoff = -3     -- CallCabinSecureTakeoff [MANUAL]
 local capt_crew_seats_takeoff = -3 -- CrewSeatsTakeoff [MANUAL]
-local capt_before_landing = -3 -- CallCabinSecureLanding [AUTOMATIC]
+local capt_before_landing = -3     -- CallCabinSecureLanding [AUTOMATIC]
 local capt_crew_seats_landing = -3 -- CrewSeatsLanding [AUTOMATIC]
 
 local flight_attendent_master_volume = -15
-local boarding_music = -15  -- BoardingMusic [MANUAL]
-local welcome = -15         -- BoardingWelcome [MANUAL]
-local safety_briefing = -15 -- Safety Briefing [MANUAL]
-local after_takeoff = -15   -- AfterTakeoff [AUTOMATIC]
-local descent_seatbelts = -15 -- DescentSeatBelts [AUTOMATIC]
-local turbulence = -15      -- Turbulence [MANUAL]
+local boarding_music = -15      -- BoardingMusic [MANUAL]
+local welcome = -15             -- BoardingWelcome [MANUAL]
+local safety_briefing = -15     -- Safety Briefing [MANUAL]
+local after_takeoff = -15       -- AfterTakeoff [AUTOMATIC]
+local descent_seatbelts = -15   -- DescentSeatBelts [AUTOMATIC]
+local turbulence = -15          -- Turbulence [MANUAL]
 local pre_safety_briefing = -15 -- PreSafetyBriefing [MANUAL]
-local after_landing = -15   -- AfterLanding [MANUAL]
+local after_landing = -15       -- AfterLanding [MANUAL]
 
 local settings_filename = ""
 local airline_icao_code = ""
@@ -214,7 +214,7 @@ function CabinAnnouncements(wnd, x, y)
         DataRef("icao_airline", "sbh/icao_airline")
 
         if icao_airline == "" then
-            settings_filename =  "cabin_announcements_volume.ini"
+            settings_filename = "cabin_announcements_volume.ini"
         else
             settings_filename = icao_airline .. "_volume.ini"
         end
@@ -353,7 +353,6 @@ function CabinAnnouncements(wnd, x, y)
 
             if imgui.Button("Save Settings") then
                 if settings_filename == "cabin_announcements_volume.ini" then
-                    
                     local airline_settings_filename = icao_airline .. "_volume.ini"
                     storeSettings(airline_settings_filename)
                     LogMsg(" New Airline volume config. Airline ICAO: " .. icao_airline)
